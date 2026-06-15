@@ -30,7 +30,7 @@ function sb_parent_active(array $pages): string {
     <div class="nav-section-label">Main</div>
 
     <div class="nav-item">
-      <a href="/gym-pro/views/admin/dashboard.php" class="nav-link <?= sb_active(['dashboard.php']) ?>">
+      <a href="/gym-system/views/admin/dashboard.php" class="nav-link <?= sb_active(['dashboard.php']) ?>">
         <span class="nav-icon">&#9699;</span>
         <span class="nav-label">Dashboard</span>
       </a>
@@ -39,7 +39,7 @@ function sb_parent_active(array $pages): string {
     <div class="nav-section-label">People</div>
 
     <div class="nav-item">
-      <a href="/gym-pro/views/admin/members.php" class="nav-link <?= sb_parent_active(['members.php']) ?>">
+      <a href="/gym-system/views/admin/members.php" class="nav-link <?= sb_parent_active(['members.php']) ?>">
         <span class="nav-icon">&#128101;</span>
         <span class="nav-label">Members</span>
       </a>
@@ -52,7 +52,7 @@ function sb_parent_active(array $pages): string {
         <span class="nav-chevron">&#9660;</span>
       </a>
       <div class="nav-submenu" id="trainersMenu" style="<?= sb_sub_open(['trainers.php']) ?>">
-        <a href="/gym-pro/views/admin/trainers.php" class="nav-link <?= sb_active(['trainers.php']) ?>">
+        <a href="/gym-system/views/admin/trainers.php" class="nav-link <?= sb_active(['trainers.php']) ?>">
           <span class="nav-label">All Trainers</span>
         </a>
       </div>
@@ -67,7 +67,7 @@ function sb_parent_active(array $pages): string {
         <span class="nav-chevron">&#9660;</span>
       </a>
       <div class="nav-submenu" id="plansMenu" style="<?= sb_sub_open(['membership_plans.php']) ?>">
-        <a href="/gym-pro/views/admin/membership_plans.php" class="nav-link <?= sb_active(['membership_plans.php']) ?>">
+        <a href="/gym-system/views/admin/membership_plans.php" class="nav-link <?= sb_active(['membership_plans.php']) ?>">
           <span class="nav-label">Plans</span>
         </a>
       </div>
@@ -80,7 +80,7 @@ function sb_parent_active(array $pages): string {
         <span class="nav-chevron">&#9660;</span>
       </a>
       <div class="nav-submenu" id="workoutMenu" style="<?= sb_sub_open(['workout_plans.php']) ?>">
-        <a href="/gym-pro/views/admin/workout_plans.php" class="nav-link <?= sb_active(['workout_plans.php']) ?>">
+        <a href="/gym-system/views/admin/workout_plans.php" class="nav-link <?= sb_active(['workout_plans.php']) ?>">
           <span class="nav-label">Workout Plans</span>
         </a>
       </div>
@@ -89,7 +89,7 @@ function sb_parent_active(array $pages): string {
     <div class="nav-section-label">Operations</div>
 
     <div class="nav-item">
-      <a href="/gym-pro/views/admin/attendance.php" class="nav-link <?= sb_active(['attendance.php']) ?>">
+      <a href="/gym-system/views/admin/attendance.php" class="nav-link <?= sb_active(['attendance.php']) ?>">
         <span class="nav-icon">&#9989;</span>
         <span class="nav-label">Attendance</span>
       </a>
@@ -102,10 +102,10 @@ function sb_parent_active(array $pages): string {
         <span class="nav-chevron">&#9660;</span>
       </a>
       <div class="nav-submenu" id="payMenu" style="<?= sb_sub_open(['payments.php']) ?>">
-        <a href="/gym-pro/views/admin/payments.php" class="nav-link <?= sb_active(['payments.php']) ?>">
+        <a href="/gym-system/views/admin/payments.php" class="nav-link <?= sb_active(['payments.php']) ?>">
           <span class="nav-label">All Payments</span>
         </a>
-        <a href="/gym-pro/views/admin/payments.php?action=add" class="nav-link">
+        <a href="/gym-system/views/admin/payments.php?action=add" class="nav-link">
           <span class="nav-label">Record Payment</span>
         </a>
       </div>
@@ -114,14 +114,14 @@ function sb_parent_active(array $pages): string {
     <div class="nav-section-label">System</div>
 
     <div class="nav-item">
-      <a href="/gym-pro/views/admin/reports.php" class="nav-link <?= sb_active(['reports.php']) ?>">
+      <a href="/gym-system/views/admin/reports.php" class="nav-link <?= sb_active(['reports.php']) ?>">
         <span class="nav-icon">&#128202;</span>
         <span class="nav-label">Reports</span>
       </a>
     </div>
 
     <div class="nav-item">
-      <a href="/gym-pro/views/admin/notifications.php" class="nav-link <?= sb_active(['notifications.php']) ?>">
+      <a href="/gym-system/views/admin/notifications.php" class="nav-link <?= sb_active(['notifications.php']) ?>">
         <span class="nav-icon">&#128276;</span>
         <span class="nav-label">Notifications<?php if ($badge > 0): ?> <span class="badge badge-danger" style="margin-left:4px"><?= $badge ?></span><?php endif; ?></span>
       </a>

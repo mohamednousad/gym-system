@@ -75,7 +75,7 @@ include APP_ROOT . '/views/includes/head_user.php';
 
 <div class="grid-2">
   <div class="card">
-    <div class="card-header"><span class="card-title">Recent Attendance</span><a href="/gym-pro/views/user/attendance.php" class="btn btn-sm btn-secondary">View All</a></div>
+    <div class="card-header"><span class="card-title">Recent Attendance</span><a href="/gym-system/views/user/attendance.php" class="btn btn-sm btn-secondary">View All</a></div>
     <div class="table-wrap">
       <table>
         <tr><th>Date</th><th>In</th><th>Out</th><th>Status</th></tr>
@@ -87,7 +87,7 @@ include APP_ROOT . '/views/includes/head_user.php';
     </div>
   </div>
   <div class="card">
-    <div class="card-header"><span class="card-title">Unread Notifications</span><a href="/gym-pro/views/user/notifications.php" class="btn btn-sm btn-secondary">View All</a></div>
+    <div class="card-header"><span class="card-title">Unread Notifications</span><a href="/gym-system/views/user/notifications.php" class="btn btn-sm btn-secondary">View All</a></div>
     <?php foreach ($notes as $n): ?>
     <div class="notif-item unread">
       <div class="notif-title"><?= e($n['title']) ?></div>

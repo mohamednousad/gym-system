@@ -122,7 +122,7 @@ include APP_ROOT . '/views/includes/head_user.php';
                 <?php endforeach; ?>
             </div>
             <div style="margin-top:14px;">
-                <a href="/gym-pro/views/user/membership.php" class="btn btn-primary btn-sm" style="width:100%;">Manage Membership</a>
+                <a href="/gym-system/views/user/membership.php" class="btn btn-primary btn-sm" style="width:100%;">Manage Membership</a>
             </div>
         </div>
     </div>
