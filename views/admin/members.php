@@ -5,6 +5,17 @@ define('PAGE_TITLE', 'Members');
 define('PAGE_SUB', 'Manage gym member accounts');
 
 $pdo = db();
+if (is_post() && post('_method') === 'DELETE') {
+    verify_csrf();
+    $did = (int)post('del_id');
+    $pdo->prepare('DELETE FROM user_workout_plans WHERE user_id=:id')->execute(['id'=>$did]);
+    $pdo->prepare('DELETE FROM attendance WHERE user_id=:id')->execute(['id'=>$did]);
+    $pdo->prepare('DELETE FROM payments WHERE user_id=:id')->execute(['id'=>$did]);
+    $pdo->prepare('DELETE FROM notifications WHERE user_id=:id')->execute(['id'=>$did]);
+    $pdo->prepare('DELETE FROM users WHERE id=:id AND role="user"')->execute(['id'=>$did]);
+    flash('Member removed.');
+    redirect('members.php');
+}
 $expired = $pdo->query("SELECT id FROM users WHERE role='user' AND membership_status!='expired' AND renewal_date < CURDATE()")->fetchAll();
 foreach ($expired as $eu) {
     $pdo->prepare("UPDATE users SET membership_status='expired' WHERE id=:id")->execute(['id' => $eu['id']]);
@@ -92,7 +103,7 @@ include APP_ROOT . '/views/includes/head_admin.php';
 <div class="card">
   <div class="table-wrap">
     <table>
-      <tr><th>Member</th><th>Email</th><th>Phone</th><th>Plan</th><th>Status</th><th>Renewal</th><th>Joined</th></tr>
+      <tr><th>Member</th><th>Email</th><th>Phone</th><th>Plan</th><th>Status</th><th>Renewal</th><th>Joined</th><th>Action</th></tr>
       <?php if (empty($members)): ?>
       <tr><td colspan="7"><div class="empty-state"><div class="empty-icon"></div><p>No members found</p></div></td></tr>
       <?php else: ?>
@@ -112,6 +123,14 @@ include APP_ROOT . '/views/includes/head_admin.php';
         <td><?= badge_status($m['membership_status']) ?></td>
         <td><?= e($m['renewal_date'] ?: '-') ?></td>
         <td><?= e(date('d M Y', strtotime($m['created_at']))) ?></td>
+        <td>
+          <form method="POST" id="delM<?= $m['id'] ?>" style="display:none">
+            <?= csrf_field() ?>
+            <input type="hidden" name="_method" value="DELETE">
+            <input type="hidden" name="del_id" value="<?= $m['id'] ?>">
+          </form>
+          <button class="btn btn-sm btn-danger" onclick="confirmDelete('delM<?= $m['id'] ?>','Delete <?= e(addslashes($m['name'])) ?>?')">Remove</button>
+        </td>
       </tr>
       <?php endforeach; ?>
       <?php endif; ?>

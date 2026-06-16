@@ -45,7 +45,7 @@ include APP_ROOT . '/views/includes/head_admin.php';
 ?>
 <div class="page-header">
   <div><h2>Payments</h2><p>Total collected: <?= money($total_amount) ?></p></div>
-  <button class="btn btn-primary" data-open-modal="payModal">+ Record Payment</button>
+  <button class="btn btn-primary" data-open-modal="payModal">+ Add Payment</button>
 </div>
 <div class="card filter-card">
   <form method="GET" class="filter-row" onsubmit="return validateDates()">
@@ -84,7 +84,7 @@ include APP_ROOT . '/views/includes/head_admin.php';
 </div>
 <div class="modal-overlay" id="payModal">
   <div class="modal">
-    <div class="modal-header"><span class="modal-title">Record Payment</span><button class="modal-close" data-close-modal="payModal">&#x2715;</button></div>
+    <div class="modal-header"><span class="modal-title">Add Payment</span><button class="modal-close" data-close-modal="payModal">&#x2715;</button></div>
     <form method="POST">
       <?= csrf_field() ?>
       <div class="modal-body">
@@ -99,7 +99,7 @@ include APP_ROOT . '/views/includes/head_admin.php';
           <div class="form-group"><label class="form-label">Reference</label><input name="reference" class="form-control" placeholder="PAY-001"></div>
         </div>
       </div>
-      <div class="modal-footer"><button type="button" class="btn btn-secondary" data-close-modal="payModal">Cancel</button><button type="submit" class="btn btn-primary">Record Payment</button></div>
+      <div class="modal-footer"><button type="button" class="btn btn-secondary" data-close-modal="payModal">Cancel</button><button type="submit" class="btn btn-primary">Add Payment</button></div>
     </form>
   </div>
 </div>
