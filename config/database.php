@@ -3,7 +3,7 @@ function db(): PDO {
     static $pdo = null;
     if ($pdo === null) {
         $host   = 'localhost';
-        $dbname = 'gym-2';
+        $dbname = 'gym';
         $user   = 'root';
         $pass   = '';
         try {
