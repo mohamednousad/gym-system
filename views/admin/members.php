@@ -20,7 +20,12 @@ $export = get('export');
 
 $where = "role='user'";
 $params = [];
-if ($q !== '') { $where .= " AND (name LIKE :q OR email LIKE :q OR phone LIKE :q)"; $params[':q'] = "%$q%"; }
+if ($q !== '') {
+    $where .= " AND (name LIKE :q1 OR email LIKE :q2 OR phone LIKE :q3)";
+    $params[':q1'] = "%$q%";
+    $params[':q2'] = "%$q%";
+    $params[':q3'] = "%$q%";
+}
 if (in_array($status, ['active','expired','pending'])) { $where .= " AND membership_status=:status"; $params[':status'] = $status; }
 if ($plan !== '') { $where .= " AND membership_plan=:plan"; $params[':plan'] = $plan; }
 if ($from !== '') { $where .= " AND renewal_date >= :from"; $params[':from'] = $from; }
@@ -89,7 +94,7 @@ include APP_ROOT . '/views/includes/head_admin.php';
     <table>
       <tr><th>Member</th><th>Email</th><th>Phone</th><th>Plan</th><th>Status</th><th>Renewal</th><th>Joined</th></tr>
       <?php if (empty($members)): ?>
-      <tr><td colspan="7"><div class="empty-state"><div class="empty-icon">&#128101;</div><p>No members found</p></div></td></tr>
+      <tr><td colspan="7"><div class="empty-state"><div class="empty-icon"></div><p>No members found</p></div></td></tr>
       <?php else: ?>
       <?php foreach ($members as $m): ?>
       <tr>
@@ -126,8 +131,8 @@ include APP_ROOT . '/views/includes/head_admin.php';
       <?php if ($preview['profile_image']): ?>
         <img src="<?= e(img_url($preview['profile_image'])) ?>" onclick="showImageModal('<?= e(img_url($preview['profile_image'])) ?>')" style="width:84px;height:84px;border-radius:50%;object-fit:cover;margin:0 auto 14px;border:3px solid var(--primary);cursor:zoom-in;">
       <?php else: ?>
-        <?= avatar($preview['name'], null, 84) ?>
-        <div style="height:14px"></div>
+        
+      <div style="height:14px"><?= avatar($preview['name'], null, 84) ?></div>
       <?php endif; ?>
       <div style="font-size:18px;font-weight:700;"><?= e($preview['name']) ?></div>
       <div style="color:var(--muted);font-size:13px;margin-bottom:14px;"><?= e($preview['email']) ?></div>

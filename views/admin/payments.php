@@ -25,7 +25,12 @@ if (is_post()) {
 }
 $q = get('q'); $from = get('from_date'); $to = get('to_date'); $method_f = get('method');
 $where = '1=1'; $params = [];
-if ($q!=='') { $where .= " AND (u.name LIKE :q OR u.email LIKE :q OR p.reference LIKE :q)"; $params[':q']="%$q%"; }
+if ($q !== '') {
+    $where .= " AND (u.name LIKE :q1 OR u.email LIKE :q2 OR p.reference LIKE :q3)";
+    $params[':q1'] = "%$q%";
+    $params[':q2'] = "%$q%";
+    $params[':q3'] = "%$q%";
+}
 if ($from!=='') { $where .= " AND p.payment_date >= :from"; $params[':from']=$from; }
 if ($to!=='') { $where .= " AND p.payment_date <= :to"; $params[':to']=$to; }
 if (in_array($method_f,['cash','card','online'])) { $where .= " AND p.method=:method"; $params[':method']=$method_f; }

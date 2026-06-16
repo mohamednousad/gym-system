@@ -35,7 +35,12 @@ if (isset($_GET['del'])) {
 $q = get('q');
 $status_f = get('status');
 $where = '1=1'; $params = [];
-if ($q !== '') { $where .= " AND (name LIKE :q OR email LIKE :q OR specialization LIKE :q)"; $params[':q'] = "%$q%"; }
+if ($q !== '') {
+    $where .= " AND (name LIKE :q1 OR email LIKE :q2 OR specialization LIKE :q3)";
+    $params[':q1'] = "%$q%";
+    $params[':q2'] = "%$q%";
+    $params[':q3'] = "%$q%";
+}
 if (in_array($status_f, ['active','inactive'])) { $where .= " AND status=:st"; $params[':st'] = $status_f; }
 $cnt_s = $pdo->prepare("SELECT COUNT(*) FROM trainers WHERE $where"); $cnt_s->execute($params); $total = (int)$cnt_s->fetchColumn();
 $pag = paginate($total, 10);
@@ -71,7 +76,7 @@ include APP_ROOT . '/views/includes/head_admin.php';
   <div class="table-wrap">
     <table>
       <tr><th>Name</th><th>Email</th><th>Phone</th><th>Specialization</th><th>Exp. Years</th><th>Status</th><th>Actions</th></tr>
-      <?php if (empty($rows)): ?><tr><td colspan="7"><div class="empty-state"><div class="empty-icon">&#127947;</div><p>No trainers found</p></div></td></tr>
+      <?php if (empty($rows)): ?><tr><td colspan="7"><div class="empty-state"><div class="empty-icon"></div><p>No trainers found</p></div></td></tr>
       <?php else: foreach ($rows as $r): ?>
       <tr>
         <td><strong><?= e($r['name']) ?></strong></td>

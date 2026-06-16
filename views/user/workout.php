@@ -26,7 +26,7 @@ include APP_ROOT . '/views/includes/head_user.php';
 <div class="page-header"><div><h2>Workout Plans</h2><p>Select a plan to get started</p></div></div>
 <?php if ($active_wp): ?>
 <div class="card" style="margin-bottom:20px;border-color:var(--primary)">
-  <div class="card-header"><span class="card-title" style="color:var(--primary)">&#127942; Active Plan: <?= e($active_wp['plan_name']) ?></span><?= badge_status($active_wp['difficulty']) ?></div>
+  <div class="card-header"><span class="card-title" style="color:var(--primary)">Active Plan: <?= e($active_wp['plan_name']) ?></span><?= badge_status($active_wp['difficulty']) ?></div>
   <div class="form-row">
     <div><span class="text-muted" style="font-size:12px">Goal</span><div style="font-weight:600"><?= e($active_wp['goal']??'—') ?></div></div>
     <div><span class="text-muted" style="font-size:12px">Trainer</span><div style="font-weight:600"><?= e($active_wp['trainer']??'Unassigned') ?></div></div>

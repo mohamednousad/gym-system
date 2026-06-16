@@ -24,22 +24,18 @@ include APP_ROOT . '/views/includes/head_admin.php';
 ?>
 <div class="stat-cards">
   <div class="stat-card">
-    <div class="stat-icon" style="background:rgba(56,189,248,0.12);color:var(--info);">&#128101;</div>
     <div class="stat-val"><?= e($counts['members']) ?></div>
     <div class="stat-label">Total Members</div>
   </div>
   <div class="stat-card">
-    <div class="stat-icon" style="background:rgba(34,197,94,0.12);color:var(--success);">&#127947;</div>
     <div class="stat-val"><?= e($counts['trainers']) ?></div>
     <div class="stat-label">Active Trainers</div>
   </div>
   <div class="stat-card">
-    <div class="stat-icon" style="background:rgba(224,188,82,0.12);color:var(--primary);">&#9989;</div>
     <div class="stat-val"><?= e($counts['today']) ?></div>
     <div class="stat-label">Today Attendance</div>
   </div>
   <div class="stat-card">
-    <div class="stat-icon" style="background:rgba(239,68,68,0.12);color:var(--danger);">&#128176;</div>
     <div class="stat-val"><?= money($counts['revenue']) ?></div>
     <div class="stat-label">This Month Revenue</div>
   </div>
