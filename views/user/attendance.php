@@ -1,5 +1,5 @@
 <?php
-require_once '../../config/bootstrap.php';
+require_once '../../config/navigation.php';
 require_user();
 define('PAGE_TITLE', 'My Attendance');
 define('PAGE_SUB', 'Your check-in history');
@@ -10,7 +10,7 @@ $where = "user_id=:uid"; $params=[':uid'=>$user['id']];
 if ($from!=='') { $where .= " AND attendance_date>=:from"; $params[':from']=$from; }
 if ($to!=='') { $where .= " AND attendance_date<=:to"; $params[':to']=$to; }
 $cnt_s = $pdo->prepare("SELECT COUNT(*) FROM attendance WHERE $where"); $cnt_s->execute($params); $total=(int)$cnt_s->fetchColumn();
-$pag = paginate($total,10);
+$pag = paginate($total,5);
 $s = $pdo->prepare("SELECT * FROM attendance WHERE $where ORDER BY attendance_date DESC LIMIT :lim OFFSET :off");
 foreach ($params as $k=>$v) $s->bindValue($k,$v);
 $s->bindValue(':lim',$pag['per_page'],PDO::PARAM_INT); $s->bindValue(':off',$pag['offset'],PDO::PARAM_INT); $s->execute();

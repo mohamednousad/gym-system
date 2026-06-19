@@ -1,5 +1,5 @@
 <?php
-require_once 'config/bootstrap.php';
+require_once 'config/navigation.php';
 if (is_logged_in()) redirect('/gym-system/views/user/dashboard.php');
 $error = ''; $success = '';
 if (is_post()) {

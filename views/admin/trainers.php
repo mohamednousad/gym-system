@@ -1,5 +1,5 @@
 <?php
-require_once '../../config/bootstrap.php';
+require_once '../../config/navigation.php';
 require_admin();
 define('PAGE_TITLE', 'Trainers');
 define('PAGE_SUB', 'Manage training staff');
@@ -9,13 +9,21 @@ if (is_post()) {
     verify_csrf();
     $id = (int)post('id');
     $data = ['name'=>post('name'),'email'=>post('email'),'phone'=>post('phone'),'specialization'=>post('specialization'),'experience_years'=>(int)post('experience_years'),'status'=>post('status','active')];
-    if ($id) {
-        $data['id'] = $id;
-        $pdo->prepare('UPDATE trainers SET name=:name,email=:email,phone=:phone,specialization=:specialization,experience_years=:experience_years,status=:status WHERE id=:id')->execute($data);
-        flash('Trainer updated.');
-    } else {
-        $pdo->prepare('INSERT INTO trainers (name,email,phone,specialization,experience_years,status) VALUES (:name,:email,:phone,:specialization,:experience_years,:status)')->execute($data);
-        flash('Trainer added.');
+    try {
+        if ($id) {
+            $data['id'] = $id;
+            $pdo->prepare('UPDATE trainers SET name=:name,email=:email,phone=:phone,specialization=:specialization,experience_years=:experience_years,status=:status WHERE id=:id')->execute($data);
+            flash('Trainer updated.');
+        } else {
+            $pdo->prepare('INSERT INTO trainers (name,email,phone,specialization,experience_years,status) VALUES (:name,:email,:phone,:specialization,:experience_years,:status)')->execute($data);
+            flash('Trainer added.');
+        }
+    } catch (PDOException $e) {
+        if ($e->errorInfo[1] === 1062) {
+            flash('A trainer with this email already exists.', 'error');
+        } else {
+            throw $e;
+        }
     }
     redirect('trainers.php');
 }
@@ -43,7 +51,7 @@ if ($q !== '') {
 }
 if (in_array($status_f, ['active','inactive'])) { $where .= " AND status=:st"; $params[':st'] = $status_f; }
 $cnt_s = $pdo->prepare("SELECT COUNT(*) FROM trainers WHERE $where"); $cnt_s->execute($params); $total = (int)$cnt_s->fetchColumn();
-$pag = paginate($total, 10);
+$pag = paginate($total, 4);
 $s = $pdo->prepare("SELECT * FROM trainers WHERE $where ORDER BY created_at DESC LIMIT :lim OFFSET :off");
 foreach ($params as $k => $v) $s->bindValue($k, $v);
 $s->bindValue(':lim', $pag['per_page'], PDO::PARAM_INT);

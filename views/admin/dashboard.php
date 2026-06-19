@@ -1,5 +1,5 @@
 <?php
-require_once '../../config/bootstrap.php';
+require_once '../../config/navigation.php';
 require_admin();
 define('PAGE_TITLE', 'Dashboard');
 define('PAGE_SUB', 'Live overview of gym operations');

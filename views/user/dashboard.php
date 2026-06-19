@@ -1,5 +1,5 @@
 <?php
-require_once '../../config/bootstrap.php';
+require_once '../../config/navigation.php';
 require_user();
 define('PAGE_TITLE', 'My Dashboard');
 define('PAGE_SUB', 'Your fitness overview');

@@ -1,5 +1,5 @@
 <?php
-require_once '../../config/bootstrap.php';
+require_once '../../config/navigation.php';
 require_admin();
 define('PAGE_TITLE', 'Payments');
 define('PAGE_SUB', 'Record and track membership payments');
@@ -36,7 +36,7 @@ if ($to!=='') { $where .= " AND p.payment_date <= :to"; $params[':to']=$to; }
 if (in_array($method_f,['cash','card','online'])) { $where .= " AND p.method=:method"; $params[':method']=$method_f; }
 $cnt_s = $pdo->prepare("SELECT COUNT(*) FROM payments p JOIN users u ON u.id=p.user_id WHERE $where"); $cnt_s->execute($params); $total=(int)$cnt_s->fetchColumn();
 $sum_s = $pdo->prepare("SELECT COALESCE(SUM(p.amount),0) FROM payments p JOIN users u ON u.id=p.user_id WHERE $where"); $sum_s->execute($params); $total_amount=(float)$sum_s->fetchColumn();
-$pag = paginate($total,10);
+$pag = paginate($total,5);
 $s = $pdo->prepare("SELECT p.*,u.name,u.email,mp.name plan_name FROM payments p JOIN users u ON u.id=p.user_id LEFT JOIN membership_plans mp ON mp.id=p.membership_plan_id WHERE $where ORDER BY p.payment_date DESC,p.id DESC LIMIT :lim OFFSET :off");
 foreach ($params as $k=>$v) $s->bindValue($k,$v);
 $s->bindValue(':lim',$pag['per_page'],PDO::PARAM_INT); $s->bindValue(':off',$pag['offset'],PDO::PARAM_INT); $s->execute();

@@ -1,5 +1,5 @@
 <?php
-require_once '../../config/bootstrap.php';
+require_once '../../config/navigation.php';
 require_user();
 define('PAGE_TITLE', 'Workout Plans');
 define('PAGE_SUB', 'Browse and select your training program');

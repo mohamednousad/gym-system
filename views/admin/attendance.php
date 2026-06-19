@@ -1,5 +1,5 @@
 <?php
-require_once '../../config/bootstrap.php';
+require_once '../../config/navigation.php';
 require_admin();
 define('PAGE_TITLE', 'Attendance');
 define('PAGE_SUB', 'Members mark their own attendance');
@@ -11,7 +11,7 @@ if ($member_f) { $where .= " AND a.user_id=:mid"; $params[':mid']=$member_f; }
 if ($from!=='') { $where .= " AND a.attendance_date>=:from"; $params[':from']=$from; }
 if ($to!=='') { $where .= " AND a.attendance_date<=:to"; $params[':to']=$to; }
 $cnt_s = $pdo->prepare("SELECT COUNT(*) FROM attendance a JOIN users u ON u.id=a.user_id WHERE $where"); $cnt_s->execute($params); $total=(int)$cnt_s->fetchColumn();
-$pag = paginate($total,10);
+$pag = paginate($total,5);
 $s = $pdo->prepare("SELECT a.*,u.name,u.email FROM attendance a JOIN users u ON u.id=a.user_id WHERE $where ORDER BY a.attendance_date DESC,a.check_in DESC LIMIT :lim OFFSET :off");
 foreach ($params as $k=>$v) $s->bindValue($k,$v);
 $s->bindValue(':lim',$pag['per_page'],PDO::PARAM_INT); $s->bindValue(':off',$pag['offset'],PDO::PARAM_INT); $s->execute();

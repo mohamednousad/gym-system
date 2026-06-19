@@ -1,5 +1,5 @@
 <?php
-require_once '../../config/bootstrap.php';
+require_once '../../config/navigation.php';
 require_admin();
 define('PAGE_TITLE', 'Notifications');
 define('PAGE_SUB', 'Send and manage system alerts');
@@ -15,14 +15,21 @@ if (is_post()) {
 }
 if (get_int('read') > 0) { mark_read(get_int('read'),(int)$me['id']); redirect('notifications.php'); }
 if (get('read_all') === '1') { mark_all_read((int)$me['id']); flash('All marked as read.'); redirect('notifications.php'); }
-$rows = $pdo->prepare('SELECT * FROM notifications WHERE user_id=:id ORDER BY created_at DESC'); $rows->execute(['id'=>$me['id']]); $rows=$rows->fetchAll();
-$unread = array_filter($rows, fn($n) => !$n['is_read']);
+$unread_cnt_s = $pdo->prepare('SELECT COUNT(*) FROM notifications WHERE user_id=:id AND is_read=0'); $unread_cnt_s->execute(['id'=>$me['id']]); $unread_count=(int)$unread_cnt_s->fetchColumn();
+$cnt_s = $pdo->prepare('SELECT COUNT(*) FROM notifications WHERE user_id=:id'); $cnt_s->execute(['id'=>$me['id']]); $total=(int)$cnt_s->fetchColumn();
+$pag = paginate($total, 4);
+$s = $pdo->prepare('SELECT * FROM notifications WHERE user_id=:id ORDER BY created_at DESC LIMIT :lim OFFSET :off');
+$s->bindValue(':id', $me['id'], PDO::PARAM_INT);
+$s->bindValue(':lim', $pag['per_page'], PDO::PARAM_INT);
+$s->bindValue(':off', $pag['offset'], PDO::PARAM_INT);
+$s->execute();
+$rows = $s->fetchAll();
 include APP_ROOT . '/views/includes/head_admin.php';
 ?>
 <div class="page-header">
-  <div><h2>Notifications</h2><p><?= count($unread) ?> unread</p></div>
+  <div><h2>Notifications</h2><p><?= $unread_count ?> unread</p></div>
   <div class="page-actions">
-    <?php if ($unread): ?><a href="?read_all=1" class="btn btn-secondary btn-sm">Mark all read</a><?php endif; ?>
+    <?php if ($unread_count): ?><a href="?read_all=1" class="btn btn-secondary btn-sm">Mark all read</a><?php endif; ?>
     <button class="btn btn-primary" data-open-modal="sendModal">+ Send Notification</button>
   </div>
 </div>
@@ -39,6 +46,7 @@ include APP_ROOT . '/views/includes/head_admin.php';
     </div>
   </div>
   <?php endforeach; endif; ?>
+  <?= render_pagination($pag) ?>
 </div>
 <div class="modal-overlay" id="sendModal">
   <div class="modal">
@@ -47,11 +55,15 @@ include APP_ROOT . '/views/includes/head_admin.php';
       <?= csrf_field() ?>
       <div class="modal-body">
         <div class="form-group"><label class="form-label">Target *</label>
-          <select name="target" class="form-select">
-            <option value="all">All Members</option>
-            <option value="admins">Admins</option>
-            <?= member_select(0,'target') ?>
-          </select>
+        <select name="target" class="form-select">
+          <option value="all">All Members</option>
+          <option value="admins">Admins</option>
+          <?php
+            $members = $pdo->query("SELECT id,name,email FROM users WHERE role='user' ORDER BY name")->fetchAll();
+            foreach ($members as $m): ?>
+            <option value="<?= $m['id'] ?>"><?= e($m['name']) ?> – <?= e($m['email']) ?></option>
+          <?php endforeach; ?>
+        </select>
         </div>
         <div class="form-group"><label class="form-label">Title *</label><input name="title" class="form-control" required placeholder="Notification title"></div>
         <div class="form-group"><label class="form-label">Message *</label><textarea name="message" class="form-control" required placeholder="Message content..."></textarea></div>

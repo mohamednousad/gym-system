@@ -1,5 +1,5 @@
 <?php
-require_once '../../config/bootstrap.php';
+require_once '../../config/navigation.php';
 require_user();
 define('PAGE_TITLE', 'My Profile');
 define('PAGE_SUB', 'Update your personal details');
@@ -59,7 +59,7 @@ include APP_ROOT . '/views/includes/head_user.php';
                 <?php endif; ?>
                 <div style="margin-top:10px;">
                     <label class="btn btn-secondary btn-sm" style="cursor:pointer;">
-                        &#128247; Change Photo
+                        Upload
                         <input type="file" name="profile_image" accept="image/*" style="display:none;" onchange="previewImage(this)">
                     </label>
                 </div>

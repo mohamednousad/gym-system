@@ -1,5 +1,5 @@
 <?php
-require_once '../../config/bootstrap.php';
+require_once '../../config/navigation.php';
 require_admin();
 define('PAGE_TITLE', 'Members');
 define('PAGE_SUB', 'Manage gym member accounts');
@@ -52,7 +52,7 @@ if (in_array($export, ['csv','pdf'])) {
     $export === 'csv' ? export_csv($all, $cols, 'members') : export_pdf($all, $cols, 'Members Report');
 }
 
-$pag = paginate($total, 10);
+$pag = paginate($total, 5);
 $s = $pdo->prepare("SELECT id,name,email,phone,membership_plan,membership_status,renewal_date,profile_image,created_at FROM users WHERE $where ORDER BY created_at DESC LIMIT :lim OFFSET :off");
 foreach ($params as $k => $v) $s->bindValue($k, $v);
 $s->bindValue(':lim', $pag['per_page'], PDO::PARAM_INT);
