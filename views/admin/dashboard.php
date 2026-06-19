@@ -42,7 +42,7 @@ include APP_ROOT . '/views/includes/head_admin.php';
 </div>
 
 <?php if ($counts['pending'] > 0): ?>
-<div class="flash flash-info" style="margin-bottom:20px;">&#128276; <?= (int)$counts['pending'] ?> member(s) have pending membership status. <a href="/gym-system/views/admin/members.php?status=pending" style="color:var(--primary);font-weight:700;">View &rarr;</a></div>
+<div class="flash flash-info" style="margin-bottom:20px;"><?= (int)$counts['pending'] ?> member(s) have pending membership status. <a href="/gym-system/views/admin/members.php?status=pending" style="color:var(--primary);font-weight:700;">View &rarr;</a></div>
 <?php endif; ?>
 
 <div class="grid-2">

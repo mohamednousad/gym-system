@@ -60,6 +60,10 @@ $s->execute();
 $rows = $s->fetchAll();
 include APP_ROOT . '/views/includes/head_admin.php';
 ?>
+<style>
+.field-error{color:#dc2626;font-size:0.78rem;margin-top:3px;display:none;}
+.input-invalid{border-color:#dc2626!important;}
+</style>
 <div class="page-header">
   <div><h2>Trainers</h2><p><?= $total ?> trainer(s) registered</p></div>
   <button class="btn btn-primary" data-open-modal="addTrainerModal">+ Add Trainer</button>
@@ -118,20 +122,41 @@ include APP_ROOT . '/views/includes/head_admin.php';
       <span class="modal-title">Trainer Details</span>
       <button class="modal-close" data-close-modal="addTrainerModal">&#x2715;</button>
     </div>
-    <form method="POST" id="trainerForm">
+    <form method="POST" id="trainerForm" novalidate>
       <?= csrf_field() ?>
       <input type="hidden" name="id" value="">
       <div class="modal-body">
         <div class="form-row">
-          <div class="form-group"><label class="form-label">Name *</label><input name="name" class="form-control" required placeholder="Full name"></div>
-          <div class="form-group"><label class="form-label">Email *</label><input type="email" name="email" class="form-control" required placeholder="email@example.com"></div>
+          <div class="form-group">
+            <label class="form-label">Name *</label>
+            <input name="name" id="f_name" class="form-control" placeholder="Full name">
+            <div class="field-error" id="e_name">Name is required.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email *</label>
+            <input type="email" name="email" id="f_email" class="form-control" placeholder="email@example.com">
+            <div class="field-error" id="e_email">Valid email is required.</div>
+          </div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label class="form-label">Phone</label><input name="phone" class="form-control" placeholder="+94 77..."></div>
-          <div class="form-group"><label class="form-label">Experience Years</label><input type="number" name="experience_years" class="form-control" min="0" placeholder="e.g. 5"></div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input name="phone" id="f_phone" class="form-control" placeholder="+94 77...">
+            <div class="field-error" id="e_phone">Enter a valid phone number.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Experience Years</label>
+            <input type="number" name="experience_years" id="f_exp" class="form-control" min="0" max="60" placeholder="e.g. 5">
+            <div class="field-error" id="e_exp">Enter a valid number (0–60).</div>
+          </div>
         </div>
-        <div class="form-group"><label class="form-label">Specialization</label><input name="specialization" class="form-control" placeholder="e.g. Weight Training"></div>
-        <div class="form-group"><label class="form-label">Status</label>
+        <div class="form-group">
+          <label class="form-label">Specialization</label>
+          <input name="specialization" id="f_spec" class="form-control" placeholder="e.g. Weight Training">
+          <div class="field-error" id="e_spec">Specialization is required.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
           <select name="status" class="form-select">
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
@@ -145,4 +170,40 @@ include APP_ROOT . '/views/includes/head_admin.php';
     </form>
   </div>
 </div>
+<script>
+document.getElementById('trainerForm').addEventListener('submit', function(e) {
+    var ok = true;
+    function err(inputId, errId, condition) {
+        var inp = document.getElementById(inputId);
+        var msg = document.getElementById(errId);
+        if (condition) {
+            inp.classList.add('input-invalid');
+            msg.style.display = 'block';
+            ok = false;
+        } else {
+            inp.classList.remove('input-invalid');
+            msg.style.display = 'none';
+        }
+    }
+    var name  = document.getElementById('f_name').value.trim();
+    var email = document.getElementById('f_email').value.trim();
+    var phone = document.getElementById('f_phone').value.trim();
+    var exp   = document.getElementById('f_exp').value;
+    var spec  = document.getElementById('f_spec').value.trim();
+    err('f_name',  'e_name',  name === '');
+    err('f_email', 'e_email', !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+    err('f_phone', 'e_phone', phone !== '' && !/^[\d\s\+\-\(\)]{7,20}$/.test(phone));
+    err('f_exp',   'e_exp',   exp !== '' && (isNaN(exp) || +exp < 0 || +exp > 60));
+    err('f_spec',  'e_spec',  spec === '');
+    if (!ok) e.preventDefault();
+});
+document.querySelectorAll('#trainerForm input').forEach(function(inp) {
+    inp.addEventListener('input', function() {
+        inp.classList.remove('input-invalid');
+        var errId = inp.id.replace('f_', 'e_');
+        var msg = document.getElementById(errId);
+        if (msg) msg.style.display = 'none';
+    });
+});
+</script>
 <?php include APP_ROOT . '/views/includes/foot_admin.php'; ?>

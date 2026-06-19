@@ -20,8 +20,8 @@ include APP_ROOT . '/views/includes/head_user.php';
 <div class="page-header"><div><h2>Attendance</h2><p><?= $total ?> records</p></div></div>
 <div class="card filter-card">
   <form method="GET" class="filter-row" onsubmit="return validateDates()">
-    <div class="form-group"><label class="form-label">From</label><input type="date" name="from_date" id="fd" class="form-control" value="<?= e($from) ?>"></div>
-    <div class="form-group"><label class="form-label">To</label><input type="date" name="to_date" id="td" class="form-control" value="<?= e($to) ?>"></div>
+    <div class="form-group"><label class="form-label">From</label><input type="date" name="from_date" id="fd" class="form-control" value="<?= e($from) ?>" max="<?= date('Y-m-d') ?>"></div>
+    <div class="form-group"><label class="form-label">To</label><input type="date" name="to_date" id="td" class="form-control" value="<?= e($to) ?>" max="<?= date('Y-m-d') ?>"></div>
     <button type="submit" class="btn btn-primary">Filter</button>
     <a href="attendance.php" class="btn btn-secondary">Reset</a>
   </form>
@@ -38,5 +38,22 @@ include APP_ROOT . '/views/includes/head_user.php';
   </div>
   <?= render_pagination($pag) ?>
 </div>
-<script>function validateDates(){var f=document.getElementById('fd').value,t=document.getElementById('td').value;if(f&&t&&f>t){alert('From cannot be after To.');return false;}return true;}</script>
+<script>
+var today = new Date().toISOString().split('T')[0];
+document.getElementById('fd').addEventListener('change', function() {
+    if (this.value > today) { alert('From date cannot be in the future.'); this.value = ''; }
+    var t = document.getElementById('td');
+    if (t.value && this.value > t.value) { t.max = today; } else { t.max = today; }
+});
+document.getElementById('td').addEventListener('change', function() {
+    if (this.value > today) { alert('To date cannot be in the future.'); this.value = ''; }
+});
+function validateDates() {
+    var f = document.getElementById('fd').value, t = document.getElementById('td').value;
+    if (f && f > today) { alert('From date cannot be in the future.'); return false; }
+    if (t && t > today) { alert('To date cannot be in the future.'); return false; }
+    if (f && t && f > t) { alert('From date cannot be after To date.'); return false; }
+    return true;
+}
+</script>
 <?php include APP_ROOT . '/views/includes/foot_user.php'; ?>
