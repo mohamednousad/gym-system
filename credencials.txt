@@ -1,0 +1,7 @@
+#Admin Login
+email: admin@mspgym.com
+password: admin123
+
+#User Login
+email: user@mspgym.com
+password: user123

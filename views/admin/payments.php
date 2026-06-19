@@ -1,5 +1,5 @@
 <?php
-require_once '../../config/bootstrap.php';
+require_once '../../config/navigation.php';
 require_admin();
 define('PAGE_TITLE', 'Payments');
 define('PAGE_SUB', 'Record and track membership payments');
@@ -25,13 +25,18 @@ if (is_post()) {
 }
 $q = get('q'); $from = get('from_date'); $to = get('to_date'); $method_f = get('method');
 $where = '1=1'; $params = [];
-if ($q!=='') { $where .= " AND (u.name LIKE :q OR u.email LIKE :q OR p.reference LIKE :q)"; $params[':q']="%$q%"; }
+if ($q !== '') {
+    $where .= " AND (u.name LIKE :q1 OR u.email LIKE :q2 OR p.reference LIKE :q3)";
+    $params[':q1'] = "%$q%";
+    $params[':q2'] = "%$q%";
+    $params[':q3'] = "%$q%";
+}
 if ($from!=='') { $where .= " AND p.payment_date >= :from"; $params[':from']=$from; }
 if ($to!=='') { $where .= " AND p.payment_date <= :to"; $params[':to']=$to; }
 if (in_array($method_f,['cash','card','online'])) { $where .= " AND p.method=:method"; $params[':method']=$method_f; }
 $cnt_s = $pdo->prepare("SELECT COUNT(*) FROM payments p JOIN users u ON u.id=p.user_id WHERE $where"); $cnt_s->execute($params); $total=(int)$cnt_s->fetchColumn();
 $sum_s = $pdo->prepare("SELECT COALESCE(SUM(p.amount),0) FROM payments p JOIN users u ON u.id=p.user_id WHERE $where"); $sum_s->execute($params); $total_amount=(float)$sum_s->fetchColumn();
-$pag = paginate($total,10);
+$pag = paginate($total,5);
 $s = $pdo->prepare("SELECT p.*,u.name,u.email,mp.name plan_name FROM payments p JOIN users u ON u.id=p.user_id LEFT JOIN membership_plans mp ON mp.id=p.membership_plan_id WHERE $where ORDER BY p.payment_date DESC,p.id DESC LIMIT :lim OFFSET :off");
 foreach ($params as $k=>$v) $s->bindValue($k,$v);
 $s->bindValue(':lim',$pag['per_page'],PDO::PARAM_INT); $s->bindValue(':off',$pag['offset'],PDO::PARAM_INT); $s->execute();
@@ -40,7 +45,7 @@ include APP_ROOT . '/views/includes/head_admin.php';
 ?>
 <div class="page-header">
   <div><h2>Payments</h2><p>Total collected: <?= money($total_amount) ?></p></div>
-  <button class="btn btn-primary" data-open-modal="payModal">+ Record Payment</button>
+  <button class="btn btn-primary" data-open-modal="payModal">+ Add Payment</button>
 </div>
 <div class="card filter-card">
   <form method="GET" class="filter-row" onsubmit="return validateDates()">
@@ -79,7 +84,7 @@ include APP_ROOT . '/views/includes/head_admin.php';
 </div>
 <div class="modal-overlay" id="payModal">
   <div class="modal">
-    <div class="modal-header"><span class="modal-title">Record Payment</span><button class="modal-close" data-close-modal="payModal">&#x2715;</button></div>
+    <div class="modal-header"><span class="modal-title">Add Payment</span><button class="modal-close" data-close-modal="payModal">&#x2715;</button></div>
     <form method="POST">
       <?= csrf_field() ?>
       <div class="modal-body">
@@ -94,7 +99,7 @@ include APP_ROOT . '/views/includes/head_admin.php';
           <div class="form-group"><label class="form-label">Reference</label><input name="reference" class="form-control" placeholder="PAY-001"></div>
         </div>
       </div>
-      <div class="modal-footer"><button type="button" class="btn btn-secondary" data-close-modal="payModal">Cancel</button><button type="submit" class="btn btn-primary">Record Payment</button></div>
+      <div class="modal-footer"><button type="button" class="btn btn-secondary" data-close-modal="payModal">Cancel</button><button type="submit" class="btn btn-primary">Add Payment</button></div>
     </form>
   </div>
 </div>

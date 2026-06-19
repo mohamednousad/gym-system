@@ -1,5 +1,5 @@
 <?php
-require_once '../../config/bootstrap.php';
+require_once '../../config/navigation.php';
 require_admin();
 define('PAGE_TITLE', 'Trainers');
 define('PAGE_SUB', 'Manage training staff');
@@ -9,13 +9,21 @@ if (is_post()) {
     verify_csrf();
     $id = (int)post('id');
     $data = ['name'=>post('name'),'email'=>post('email'),'phone'=>post('phone'),'specialization'=>post('specialization'),'experience_years'=>(int)post('experience_years'),'status'=>post('status','active')];
-    if ($id) {
-        $data['id'] = $id;
-        $pdo->prepare('UPDATE trainers SET name=:name,email=:email,phone=:phone,specialization=:specialization,experience_years=:experience_years,status=:status WHERE id=:id')->execute($data);
-        flash('Trainer updated.');
-    } else {
-        $pdo->prepare('INSERT INTO trainers (name,email,phone,specialization,experience_years,status) VALUES (:name,:email,:phone,:specialization,:experience_years,:status)')->execute($data);
-        flash('Trainer added.');
+    try {
+        if ($id) {
+            $data['id'] = $id;
+            $pdo->prepare('UPDATE trainers SET name=:name,email=:email,phone=:phone,specialization=:specialization,experience_years=:experience_years,status=:status WHERE id=:id')->execute($data);
+            flash('Trainer updated.');
+        } else {
+            $pdo->prepare('INSERT INTO trainers (name,email,phone,specialization,experience_years,status) VALUES (:name,:email,:phone,:specialization,:experience_years,:status)')->execute($data);
+            flash('Trainer added.');
+        }
+    } catch (PDOException $e) {
+        if ($e->errorInfo[1] === 1062) {
+            flash('A trainer with this email already exists.', 'error');
+        } else {
+            throw $e;
+        }
     }
     redirect('trainers.php');
 }
@@ -35,10 +43,15 @@ if (isset($_GET['del'])) {
 $q = get('q');
 $status_f = get('status');
 $where = '1=1'; $params = [];
-if ($q !== '') { $where .= " AND (name LIKE :q OR email LIKE :q OR specialization LIKE :q)"; $params[':q'] = "%$q%"; }
+if ($q !== '') {
+    $where .= " AND (name LIKE :q1 OR email LIKE :q2 OR specialization LIKE :q3)";
+    $params[':q1'] = "%$q%";
+    $params[':q2'] = "%$q%";
+    $params[':q3'] = "%$q%";
+}
 if (in_array($status_f, ['active','inactive'])) { $where .= " AND status=:st"; $params[':st'] = $status_f; }
 $cnt_s = $pdo->prepare("SELECT COUNT(*) FROM trainers WHERE $where"); $cnt_s->execute($params); $total = (int)$cnt_s->fetchColumn();
-$pag = paginate($total, 10);
+$pag = paginate($total, 4);
 $s = $pdo->prepare("SELECT * FROM trainers WHERE $where ORDER BY created_at DESC LIMIT :lim OFFSET :off");
 foreach ($params as $k => $v) $s->bindValue($k, $v);
 $s->bindValue(':lim', $pag['per_page'], PDO::PARAM_INT);
@@ -71,7 +84,7 @@ include APP_ROOT . '/views/includes/head_admin.php';
   <div class="table-wrap">
     <table>
       <tr><th>Name</th><th>Email</th><th>Phone</th><th>Specialization</th><th>Exp. Years</th><th>Status</th><th>Actions</th></tr>
-      <?php if (empty($rows)): ?><tr><td colspan="7"><div class="empty-state"><div class="empty-icon">&#127947;</div><p>No trainers found</p></div></td></tr>
+      <?php if (empty($rows)): ?><tr><td colspan="7"><div class="empty-state"><div class="empty-icon"></div><p>No trainers found</p></div></td></tr>
       <?php else: foreach ($rows as $r): ?>
       <tr>
         <td><strong><?= e($r['name']) ?></strong></td>

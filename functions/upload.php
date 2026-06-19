@@ -36,5 +36,5 @@ function upload_image(string $field, ?string $old_path = null): ?string {
 
 function img_url(?string $path): string {
     if (!$path) return '';
-    return '/gym-pro/' . ltrim($path, '/');
+    return '/gym-system/' . ltrim($path, '/');
 }

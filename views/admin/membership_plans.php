@@ -1,5 +1,5 @@
 <?php
-require_once '../../config/bootstrap.php';
+require_once '../../config/navigation.php';
 require_admin();
 define('PAGE_TITLE', 'Membership Plans');
 define('PAGE_SUB', 'Manage subscription plans');
@@ -17,12 +17,19 @@ if (get_int('del') > 0) {
     catch (PDOException $e) { flash('Cannot delete — plan linked to payments.','error'); }
     redirect('membership_plans.php');
 }
-$plans = $pdo->query('SELECT * FROM membership_plans ORDER BY price')->fetchAll();
 $export = get('export');
+$cnt_s = $pdo->prepare("SELECT COUNT(*) FROM membership_plans"); $cnt_s->execute(); $total=(int)$cnt_s->fetchColumn();
 if (in_array($export,['csv','pdf'])) {
+    $all = $pdo->query('SELECT * FROM membership_plans ORDER BY price')->fetchAll();
     $cols=['name'=>'Plan','price'=>'Price','duration_days'=>'Days','description'=>'Description','status'=>'Status'];
-    $export==='csv' ? export_csv($plans,$cols,'membership_plans') : export_pdf($plans,$cols,'Membership Plans');
+    $export==='csv' ? export_csv($all,$cols,'membership_plans') : export_pdf($all,$cols,'Membership Plans');
 }
+$pag = paginate($total);
+$s = $pdo->prepare("SELECT * FROM membership_plans ORDER BY price LIMIT :lim OFFSET :off");
+$s->bindValue(':lim', $pag['per_page'], PDO::PARAM_INT);
+$s->bindValue(':off', $pag['offset'], PDO::PARAM_INT);
+$s->execute();
+$plans = $s->fetchAll();
 include APP_ROOT . '/views/includes/head_admin.php';
 ?>
 <div class="page-header">
@@ -52,6 +59,7 @@ include APP_ROOT . '/views/includes/head_admin.php';
       <?php if (empty($plans)): ?><tr><td colspan="6" class="empty-state">No plans yet</td></tr><?php endif; ?>
     </table>
   </div>
+  <?= render_pagination($pag) ?>
 </div>
 <div class="modal-overlay" id="planModal">
   <div class="modal">

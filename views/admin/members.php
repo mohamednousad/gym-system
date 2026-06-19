@@ -1,10 +1,21 @@
 <?php
-require_once '../../config/bootstrap.php';
+require_once '../../config/navigation.php';
 require_admin();
 define('PAGE_TITLE', 'Members');
 define('PAGE_SUB', 'Manage gym member accounts');
 
 $pdo = db();
+if (is_post() && post('_method') === 'DELETE') {
+    verify_csrf();
+    $did = (int)post('del_id');
+    $pdo->prepare('DELETE FROM user_workout_plans WHERE user_id=:id')->execute(['id'=>$did]);
+    $pdo->prepare('DELETE FROM attendance WHERE user_id=:id')->execute(['id'=>$did]);
+    $pdo->prepare('DELETE FROM payments WHERE user_id=:id')->execute(['id'=>$did]);
+    $pdo->prepare('DELETE FROM notifications WHERE user_id=:id')->execute(['id'=>$did]);
+    $pdo->prepare('DELETE FROM users WHERE id=:id AND role="user"')->execute(['id'=>$did]);
+    flash('Member removed.');
+    redirect('members.php');
+}
 $expired = $pdo->query("SELECT id FROM users WHERE role='user' AND membership_status!='expired' AND renewal_date < CURDATE()")->fetchAll();
 foreach ($expired as $eu) {
     $pdo->prepare("UPDATE users SET membership_status='expired' WHERE id=:id")->execute(['id' => $eu['id']]);
@@ -20,7 +31,12 @@ $export = get('export');
 
 $where = "role='user'";
 $params = [];
-if ($q !== '') { $where .= " AND (name LIKE :q OR email LIKE :q OR phone LIKE :q)"; $params[':q'] = "%$q%"; }
+if ($q !== '') {
+    $where .= " AND (name LIKE :q1 OR email LIKE :q2 OR phone LIKE :q3)";
+    $params[':q1'] = "%$q%";
+    $params[':q2'] = "%$q%";
+    $params[':q3'] = "%$q%";
+}
 if (in_array($status, ['active','expired','pending'])) { $where .= " AND membership_status=:status"; $params[':status'] = $status; }
 if ($plan !== '') { $where .= " AND membership_plan=:plan"; $params[':plan'] = $plan; }
 if ($from !== '') { $where .= " AND renewal_date >= :from"; $params[':from'] = $from; }
@@ -36,7 +52,7 @@ if (in_array($export, ['csv','pdf'])) {
     $export === 'csv' ? export_csv($all, $cols, 'members') : export_pdf($all, $cols, 'Members Report');
 }
 
-$pag = paginate($total, 10);
+$pag = paginate($total, 5);
 $s = $pdo->prepare("SELECT id,name,email,phone,membership_plan,membership_status,renewal_date,profile_image,created_at FROM users WHERE $where ORDER BY created_at DESC LIMIT :lim OFFSET :off");
 foreach ($params as $k => $v) $s->bindValue($k, $v);
 $s->bindValue(':lim', $pag['per_page'], PDO::PARAM_INT);
@@ -87,9 +103,9 @@ include APP_ROOT . '/views/includes/head_admin.php';
 <div class="card">
   <div class="table-wrap">
     <table>
-      <tr><th>Member</th><th>Email</th><th>Phone</th><th>Plan</th><th>Status</th><th>Renewal</th><th>Joined</th></tr>
+      <tr><th>Member</th><th>Email</th><th>Phone</th><th>Plan</th><th>Status</th><th>Renewal</th><th>Joined</th><th>Action</th></tr>
       <?php if (empty($members)): ?>
-      <tr><td colspan="7"><div class="empty-state"><div class="empty-icon">&#128101;</div><p>No members found</p></div></td></tr>
+      <tr><td colspan="7"><div class="empty-state"><div class="empty-icon"></div><p>No members found</p></div></td></tr>
       <?php else: ?>
       <?php foreach ($members as $m): ?>
       <tr>
@@ -107,6 +123,14 @@ include APP_ROOT . '/views/includes/head_admin.php';
         <td><?= badge_status($m['membership_status']) ?></td>
         <td><?= e($m['renewal_date'] ?: '-') ?></td>
         <td><?= e(date('d M Y', strtotime($m['created_at']))) ?></td>
+        <td>
+          <form method="POST" id="delM<?= $m['id'] ?>" style="display:none">
+            <?= csrf_field() ?>
+            <input type="hidden" name="_method" value="DELETE">
+            <input type="hidden" name="del_id" value="<?= $m['id'] ?>">
+          </form>
+          <button class="btn btn-sm btn-danger" onclick="confirmDelete('delM<?= $m['id'] ?>','Delete <?= e(addslashes($m['name'])) ?>?')">Remove</button>
+        </td>
       </tr>
       <?php endforeach; ?>
       <?php endif; ?>
@@ -126,8 +150,8 @@ include APP_ROOT . '/views/includes/head_admin.php';
       <?php if ($preview['profile_image']): ?>
         <img src="<?= e(img_url($preview['profile_image'])) ?>" onclick="showImageModal('<?= e(img_url($preview['profile_image'])) ?>')" style="width:84px;height:84px;border-radius:50%;object-fit:cover;margin:0 auto 14px;border:3px solid var(--primary);cursor:zoom-in;">
       <?php else: ?>
-        <?= avatar($preview['name'], null, 84) ?>
-        <div style="height:14px"></div>
+        
+      <div style="height:14px"><?= avatar($preview['name'], null, 84) ?></div>
       <?php endif; ?>
       <div style="font-size:18px;font-weight:700;"><?= e($preview['name']) ?></div>
       <div style="color:var(--muted);font-size:13px;margin-bottom:14px;"><?= e($preview['email']) ?></div>

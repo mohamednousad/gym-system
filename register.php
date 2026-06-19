@@ -1,6 +1,6 @@
 <?php
-require_once 'config/bootstrap.php';
-if (is_logged_in()) redirect('/gym-pro/views/user/dashboard.php');
+require_once 'config/navigation.php';
+if (is_logged_in()) redirect('/gym-system/views/user/dashboard.php');
 $error = ''; $success = '';
 if (is_post()) {
     verify_csrf();
@@ -22,8 +22,8 @@ if (is_post()) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Register — MSP GYM</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/gym-pro/assets/css/main.css">
-  <link rel="stylesheet" href="/gym-pro/assets/css/auth.css">
+  <link rel="stylesheet" href="/gym-system/assets/css/main.css">
+  <link rel="stylesheet" href="/gym-system/assets/css/auth.css">
 </head>
 <body class="auth-wrap">
 <div class="auth-card">
@@ -40,7 +40,7 @@ if (is_post()) {
     <div class="form-group"><label class="form-label">Password *</label><input type="password" name="password" class="form-control" required placeholder="Min. 6 characters"></div>
     <button type="submit" class="btn btn-primary" style="width:100%;margin-top:8px;">Create Account</button>
   </form>
-  <p class="auth-link">Already registered? <a href="/gym-pro/login.php">Sign in</a></p>
+  <p class="auth-link">Already registered? <a href="/gym-system/login.php">Sign in</a></p>
 </div>
 </body>
 </html>

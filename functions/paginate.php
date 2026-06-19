@@ -1,5 +1,5 @@
 <?php
-function paginate(int $total, int $per_page = 10): array {
+function paginate(int $total, int $per_page = 5): array {
     $page = max(1, (int)get('page', '1'));
     $total_pages = max(1, (int)ceil($total / $per_page));
     $page = min($page, $total_pages);

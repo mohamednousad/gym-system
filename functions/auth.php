@@ -20,19 +20,19 @@ function is_admin(): bool {
 
 function require_admin(): void {
     if (!is_logged_in()) {
-        redirect('/gym-pro/login.php?auth=unauthenticated');
+        redirect('/gym-system/login.php?auth=unauthenticated');
     }
     if (!is_admin()) {
-        redirect('/gym-pro/login.php?auth=unauthorized');
+        redirect('/gym-system/login.php?auth=unauthorized');
     }
 }
 
 function require_user(): void {
     if (!is_logged_in()) {
-        redirect('/gym-pro/login.php?auth=unauthenticated');
+        redirect('/gym-system/login.php?auth=unauthenticated');
     }
     if (is_admin()) {
-        redirect('/gym-pro/views/admin/dashboard.php');
+        redirect('/gym-system/views/admin/dashboard.php');
     }
 }
 

@@ -1,5 +1,5 @@
 <?php
-require_once '../../config/bootstrap.php';
+require_once '../../config/navigation.php';
 require_user();
 define('PAGE_TITLE', 'Membership');
 define('PAGE_SUB', 'Choose your subscription plan');

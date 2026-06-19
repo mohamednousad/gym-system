@@ -1,5 +1,5 @@
 <?php
-require_once '../../config/bootstrap.php';
+require_once '../../config/navigation.php';
 require_admin();
 define('PAGE_TITLE', 'Workout Plans');
 define('PAGE_SUB', 'Manage fitness workout programs');
@@ -18,7 +18,13 @@ if (get_int('del') > 0) {
     redirect('workout_plans.php');
 }
 $trainers = $pdo->query("SELECT id,name FROM trainers WHERE status='active' ORDER BY name")->fetchAll();
-$rows = $pdo->query('SELECT w.*,t.name trainer_name FROM workout_plans w LEFT JOIN trainers t ON t.id=w.trainer_id ORDER BY w.created_at DESC')->fetchAll();
+$cnt_s = $pdo->prepare("SELECT COUNT(*) FROM workout_plans"); $cnt_s->execute(); $total=(int)$cnt_s->fetchColumn();
+$pag = paginate($total);
+$s = $pdo->prepare("SELECT w.*,t.name trainer_name FROM workout_plans w LEFT JOIN trainers t ON t.id=w.trainer_id ORDER BY w.created_at DESC LIMIT :lim OFFSET :off");
+$s->bindValue(':lim', $pag['per_page'], PDO::PARAM_INT);
+$s->bindValue(':off', $pag['offset'], PDO::PARAM_INT);
+$s->execute();
+$rows = $s->fetchAll();
 include APP_ROOT . '/views/includes/head_admin.php';
 ?>
 <div class="page-header">
@@ -47,6 +53,7 @@ include APP_ROOT . '/views/includes/head_admin.php';
       <?php if (empty($rows)): ?><tr><td colspan="8" class="empty-state">No workout plans</td></tr><?php endif; ?>
     </table>
   </div>
+  <?= render_pagination($pag) ?>
 </div>
 <div class="modal-overlay" id="wModal">
   <div class="modal" style="max-width:580px;">

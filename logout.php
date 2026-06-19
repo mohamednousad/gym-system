@@ -1,4 +1,4 @@
 <?php
-require_once 'config/bootstrap.php';
+require_once 'config/navigation.php';
 logout_user();
-redirect('/gym-pro/login.php?auth=logged_out');
+redirect('/gym-system/login.php?redirect=auth');
