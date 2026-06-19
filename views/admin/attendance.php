@@ -50,5 +50,5 @@ include APP_ROOT . '/views/includes/head_admin.php';
   </div>
   <?= render_pagination($pag) ?>
 </div>
-<script>function validateDates(){var f=document.getElementById('fd').value,t=document.getElementById('td').value;if(f&&t&&f>t){alert('From cannot be after To.');return false;}return true;}</script>
+<script>function validateDates(){var f=document.getElementById('fd').value,t=document.getElementById('td').value;if(f&&t&&f>t){alert('From cannot be after To Date.');return false;}return true;}</script>
 <?php include APP_ROOT . '/views/includes/foot_admin.php'; ?>

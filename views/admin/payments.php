@@ -10,6 +10,12 @@ if (is_post()) {
     $plan_id = (int)post('membership_plan_id');
     $method  = post('method','cash');
     $ref     = post('reference');
+    $errors  = [];
+    if (!$user_id) $errors[] = 'Please select a member.';
+    if (!$plan_id) $errors[] = 'Please select a plan.';
+    if (!in_array($method,['cash','card','online'])) $errors[] = 'Invalid payment method.';
+    if ($ref !== '' && !preg_match('/^[\w\-]{0,50}$/', $ref)) $errors[] = 'Reference may only contain letters, numbers, and hyphens (max 50 chars).';
+    if ($errors) { foreach ($errors as $e) flash($e,'error'); redirect('payments.php'); }
     $plan_s  = $pdo->prepare("SELECT * FROM membership_plans WHERE id=:id AND status='active'"); $plan_s->execute(['id'=>$plan_id]); $plan = $plan_s->fetch();
     if ($user_id && $plan) {
         $pdo->beginTransaction();
@@ -85,18 +91,18 @@ include APP_ROOT . '/views/includes/head_admin.php';
 <div class="modal-overlay" id="payModal">
   <div class="modal">
     <div class="modal-header"><span class="modal-title">Add Payment</span><button class="modal-close" data-close-modal="payModal">&#x2715;</button></div>
-    <form method="POST">
+    <form method="POST" id="payForm" onsubmit="return validatePayForm()">
       <?= csrf_field() ?>
       <div class="modal-body">
-        <div class="form-group"><label class="form-label">Member *</label><?= member_select() ?></div>
-        <div class="form-group"><label class="form-label">Plan *</label><?= plan_select() ?></div>
+        <div class="form-group"><label class="form-label">Member *</label><?= member_select() ?><span class="field-error" id="err_member"></span></div>
+        <div class="form-group"><label class="form-label">Plan *</label><?= plan_select() ?><span class="field-error" id="err_plan"></span></div>
         <div class="form-row">
           <div class="form-group"><label class="form-label">Method</label>
             <select name="method" class="form-select">
               <?php foreach (['cash','card','online'] as $m): ?><option value="<?= $m ?>"><?= ucfirst($m) ?></option><?php endforeach; ?>
             </select>
           </div>
-          <div class="form-group"><label class="form-label">Reference</label><input name="reference" class="form-control" placeholder="PAY-001"></div>
+          <div class="form-group"><label class="form-label">Reference</label><input name="reference" id="pay_ref" class="form-control" placeholder="PAY-001" maxlength="50"><span class="field-error" id="err_ref"></span></div>
         </div>
       </div>
       <div class="modal-footer"><button type="button" class="btn btn-secondary" data-close-modal="payModal">Cancel</button><button type="submit" class="btn btn-primary">Add Payment</button></div>
@@ -104,6 +110,22 @@ include APP_ROOT . '/views/includes/head_admin.php';
   </div>
 </div>
 <script>
-function validateDates(){var f=document.getElementById('fd').value,t=document.getElementById('td').value;if(f&&t&&f>t){alert('From cannot be after To.');return false;}return true;}
+function validateDates(){
+  var f=document.getElementById('fd').value,t=document.getElementById('td').value;
+  if(f&&t&&f>t){alert('From cannot be after To Date.');return false;}
+  return true;
+}
+function validatePayForm(){
+  var ok=true;
+  document.querySelectorAll('.field-error').forEach(function(el){el.textContent='';});
+  var member=document.querySelector('[name="user_id"]');
+  if(!member||!member.value){document.getElementById('err_member').textContent='Please select a member.';ok=false;}
+  var plan=document.querySelector('[name="membership_plan_id"]');
+  if(!plan||!plan.value){document.getElementById('err_plan').textContent='Please select a plan.';ok=false;}
+  var ref=document.getElementById('pay_ref').value;
+  if(ref&&!/^[\w\-]{0,50}$/.test(ref)){document.getElementById('err_ref').textContent='Reference may only contain letters, numbers, and hyphens (max 50 chars).';ok=false;}
+  return ok;
+}
 </script>
+<style>.field-error{color:var(--danger,#e74c3c);font-size:11px;display:block;margin-top:3px;}</style>
 <?php include APP_ROOT . '/views/includes/foot_admin.php'; ?>
